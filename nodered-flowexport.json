@@ -1,0 +1,212 @@
+[
+  {
+    "id": "ce333f68.b460b",
+    "type": "tab",
+    "label": "Stromzähler Daten",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "2212a4a1.e4403c",
+    "type": "smartmeter",
+    "z": "ce333f68.b460b",
+    "name": "holley-pv",
+    "datasource": "6b51e93f.107e28",
+    "protocol": "SmlProtocol",
+    "transport": "SerialRequestResponseTransport",
+    "requestInterval": "2",
+    "d0WakeupCharacter": "",
+    "x": 240,
+    "y": 260,
+    "wires": [
+      [
+        "955c09dc.885808",
+        "c0daa5.98353558"
+      ]
+    ]
+  },
+  {
+    "id": "955c09dc.885808",
+    "type": "debug",
+    "z": "ce333f68.b460b",
+    "name": "holley-debug",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 480,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "b6acfecc.c1a52",
+    "type": "function",
+    "z": "ce333f68.b460b",
+    "name": "SQL Insert for EMPV",
+    "func": "//var msg1 =  { payload: parseFloat(msg.payload[\"1-0:1.8.0*255\"].values[\"0\"].value) }\n//var msg2 =  { payload: parseFloat(msg.payload[\"1-0:2.8.0*255\"].values[\"0\"].value) }\n//var smepoch = { payload: msg.myepoch }\n//return [ [smepoch, msg1, msg2]];\n\nvar msg1 =  parseFloat(msg.payload[\"1-0:1.8.0*255\"].values[\"0\"].value) \nvar msg2 =  parseFloat(msg.payload[\"1-0:2.8.0*255\"].values[\"0\"].value)\nvar emid = \"empv\"\nvar smepoch = msg.myepoch \nmsg.topic = \"INSERT INTO emraw(epoch, emid, em180, em280) VALUES (?,?,?,?)\";\nmsg.payload = [smepoch, emid, msg1, msg2];\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 700,
+    "y": 260,
+    "wires": [
+      [
+        "39e880b6.b2567",
+        "d03c2aa1.3d56e8"
+      ]
+    ]
+  },
+  {
+    "id": "c0daa5.98353558",
+    "type": "simpletime",
+    "z": "ce333f68.b460b",
+    "name": "myepoch",
+    "x": 460,
+    "y": 260,
+    "wires": [
+      [
+        "b6acfecc.c1a52"
+      ]
+    ]
+  },
+  {
+    "id": "a31c2288.b322c",
+    "type": "smartmeter",
+    "z": "ce333f68.b460b",
+    "name": "holley-net",
+    "datasource": "d4ec3714.da1c98",
+    "protocol": "SmlProtocol",
+    "transport": "SerialRequestResponseTransport",
+    "requestInterval": "2",
+    "d0WakeupCharacter": "",
+    "x": 240,
+    "y": 420,
+    "wires": [
+      [
+        "a624c22f.5c83"
+      ]
+    ]
+  },
+  {
+    "id": "a624c22f.5c83",
+    "type": "simpletime",
+    "z": "ce333f68.b460b",
+    "name": "myepoch",
+    "x": 460,
+    "y": 420,
+    "wires": [
+      [
+        "a413bb23.ccb7c8"
+      ]
+    ]
+  },
+  {
+    "id": "a413bb23.ccb7c8",
+    "type": "function",
+    "z": "ce333f68.b460b",
+    "name": "SQL Insert for EMNET",
+    "func": "//var msg1 =  { payload: parseFloat(msg.payload[\"1-0:1.8.0*255\"].values[\"0\"].value) }\n//var msg2 =  { payload: parseFloat(msg.payload[\"1-0:2.8.0*255\"].values[\"0\"].value) }\n//var smepoch = { payload: msg.myepoch }\n//return [ [smepoch, msg1, msg2]];\n\n\nvar msg1 =  parseFloat(msg.payload[\"1-0:1.8.0*255\"].values[\"0\"].value) \nvar msg2 =  parseFloat(msg.payload[\"1-0:2.8.0*255\"].values[\"0\"].value)\nvar emid = \"emnet\"\nvar smepoch = msg.myepoch \nmsg.topic = \"INSERT INTO emraw(epoch, emid, em180, em280) VALUES (?,?,?,?)\";\nmsg.payload = [smepoch, emid, msg1, msg2];\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 700,
+    "y": 420,
+    "wires": [
+      [
+        "95c583cb.aa421",
+        "ae3306b8.6ea148"
+      ]
+    ]
+  },
+  {
+    "id": "95c583cb.aa421",
+    "type": "mysql",
+    "z": "ce333f68.b460b",
+    "mydb": "62d161e8.effbd",
+    "name": "mysql-db",
+    "x": 1040,
+    "y": 420,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "ae3306b8.6ea148",
+    "type": "debug",
+    "z": "ce333f68.b460b",
+    "name": "complete msg",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 1040,
+    "y": 480,
+    "wires": []
+  },
+  {
+    "id": "39e880b6.b2567",
+    "type": "mysql",
+    "z": "ce333f68.b460b",
+    "mydb": "62d161e8.effbd",
+    "name": "mysql-db",
+    "x": 1040,
+    "y": 260,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "d03c2aa1.3d56e8",
+    "type": "debug",
+    "z": "ce333f68.b460b",
+    "name": "complete msg",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 1040,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "6b51e93f.107e28",
+    "type": "smartmeter-connection",
+    "z": "",
+    "sourcetype": "serial",
+    "serialport": "/dev/ttyUSB0",
+    "serialbaud": "9600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "httphost": "localhost",
+    "httpport": "80",
+    "filepath": "/dev/null"
+  },
+  {
+    "id": "d4ec3714.da1c98",
+    "type": "smartmeter-connection",
+    "z": "",
+    "sourcetype": "serial",
+    "serialport": "/dev/ttyUSB1",
+    "serialbaud": "9600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "httphost": "localhost",
+    "httpport": "80",
+    "filepath": "/dev/null"
+  },
+  {
+    "id": "62d161e8.effbd",
+    "type": "MySQLdatabase",
+    "z": "",
+    "host": "xxx.xxx.xxx.xxx",
+    "port": "3306",
+    "db": "xxxxxxxxxxx",
+    "tz": "Europe/Berlin"
+  }
+]
